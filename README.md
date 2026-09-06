@@ -139,13 +139,17 @@ regelmäßig abbricht.
 Läuft über [ntfy.sh](https://ntfy.sh) — kostenlos, ohne Konto.
 
 1. App installieren (App Store / Play Store: **ntfy**)
-2. Dort ein Topic abonnieren: `kennzeichen-3ax2icb2yn4q7r2r`
+2. Dort das eigene Topic abonnieren — es steht lokal in
+   `data/watch.local.json` und steht bewusst **nicht** im Repo
 3. Testen: `node watch.js --test-push`
 
-Das Topic steht in `data/watch.config.json` und ist zufällig erzeugt. ntfy-Topics
-sind öffentlich — wer den Namen kennt, liest mit. Deshalb der lange Zufallsname.
-Inhalt sind ohnehin nur freie Kennzeichen, nichts Persönliches. Zum Wechseln
-einfach den Wert in der Konfiguration ändern und im Handy neu abonnieren.
+ntfy-Topics sind öffentlich: Wer den Namen kennt, liest die Meldungen mit und
+kann selbst welche schicken. Deshalb ein langer Zufallsname, und deshalb liegt er
+nur in der lokal ignorierten `data/watch.local.json` sowie im GitHub-Secret
+`NTFY_TOPIC` — niemals in einer eingecheckten Datei.
+
+Ein neues Topic erzeugen: einen langen Zufallsnamen in `data/watch.local.json`
+eintragen und im Handy neu abonnieren. Eine Anmeldung braucht es dafür nicht.
 
 Auto und Motorrad teilen sich denselben Kennzeichen-Pool. Taucht ein Schild bei
 mehreren Zielen auf, kommt trotzdem nur **eine** Meldung. Bei vier Zeichen
