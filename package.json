@@ -1,0 +1,14 @@
+{
+  "name": "kennzeichen-finder",
+  "version": "1.0.0",
+  "description": "Findet die kuerzesten freien Wunschkennzeichen einer Zulassungsstelle",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "scan": "node cli.js"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

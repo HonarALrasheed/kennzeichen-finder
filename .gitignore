@@ -1,0 +1,13 @@
+node_modules/
+
+# Enthaelt das ntfy-Topic. In der Cloud kommt es aus einem GitHub-Secret.
+data/watch.local.json
+
+# Laufzeitausgaben von launchd
+data/watch.out.log
+data/watch.err.log
+
+# Lokales Feedback aus der Weboberflaeche
+data/feedback.json
+
+.DS_Store

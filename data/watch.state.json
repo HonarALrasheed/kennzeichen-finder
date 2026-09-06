@@ -1,0 +1,80 @@
+{
+  "Motorrad Münster": {
+    "plates": [
+      "MS-NQ 9",
+      "MS-QC 6",
+      "MS-QC 8",
+      "MS-QD 6",
+      "MS-QD 9",
+      "MS-QH 8",
+      "MS-QH 9",
+      "MS-QK 4",
+      "MS-QN 8",
+      "MS-QN 9",
+      "MS-QW 3",
+      "MS-QW 4",
+      "MS-QW 9",
+      "MS-QY 6",
+      "MS-UQ 6",
+      "MS-UQ 9",
+      "MS-UY 9",
+      "MS-UZ 5",
+      "MS-UZ 8",
+      "MS-VQ 6",
+      "MS-VQ 9",
+      "MS-WQ 6",
+      "MS-YW 5",
+      "MS-ZC 5",
+      "MS-ZC 9"
+    ],
+    "checkedAt": "2026-09-06T12:02:56.795Z",
+    "total": 25
+  },
+  "Auto Münster": {
+    "plates": [
+      "MS-NQ 9",
+      "MS-QC 6",
+      "MS-QC 8",
+      "MS-QD 6",
+      "MS-QD 9",
+      "MS-QH 8",
+      "MS-QH 9",
+      "MS-QK 4",
+      "MS-QN 8",
+      "MS-QN 9",
+      "MS-QW 3",
+      "MS-QW 4",
+      "MS-QW 9",
+      "MS-QY 6",
+      "MS-UQ 6",
+      "MS-UQ 9",
+      "MS-UY 9",
+      "MS-UZ 5",
+      "MS-UZ 8",
+      "MS-VQ 6",
+      "MS-VQ 9",
+      "MS-WQ 6",
+      "MS-YW 5",
+      "MS-ZC 5",
+      "MS-ZC 9"
+    ],
+    "checkedAt": "2026-09-06T12:02:45.745Z",
+    "total": 25
+  },
+  "Auto Lüdinghausen": {
+    "plates": [
+      "LH-U 54",
+      "LH-U 79"
+    ],
+    "checkedAt": "2026-09-06T12:03:07.353Z",
+    "total": 2
+  },
+  "Motorrad Lüdinghausen": {
+    "plates": [
+      "LH-U 54",
+      "LH-U 79"
+    ],
+    "checkedAt": "2026-09-06T12:03:15.294Z",
+    "total": 2
+  }
+}

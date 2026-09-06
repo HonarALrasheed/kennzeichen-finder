@@ -1,0 +1,68 @@
+name: Kennzeichen-Wächter
+
+# Prueft dreimal taeglich, ob in Muenster oder Luedinghausen ein kurzes
+# Kennzeichen frei geworden ist, und schickt bei Aenderung eine Push-Meldung.
+#
+# Die Zeiten sind UTC. Im Sommer (CEST) entspricht das 08:00 / 13:00 / 19:00,
+# im Winter (CET) einer Stunde frueher. GitHub startet geplante Laeufe unter
+# Last gerne mit einigen Minuten Verspaetung - fuer diesen Zweck egal.
+on:
+  schedule:
+    - cron: '0 6,11,17 * * *'
+  workflow_dispatch:        # Knopf zum manuellen Ausloesen
+
+# Der Lauf schreibt den erkannten Stand zurueck ins Repo.
+permissions:
+  contents: write
+
+# Zwei gleichzeitige Laeufe wuerden sich beim Zurueckschreiben in die Quere
+# kommen und das Portal doppelt belasten.
+concurrency:
+  group: kennzeichen-watch
+  cancel-in-progress: false
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v4
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Abhaengigkeiten installieren
+        run: npm ci --omit=dev
+
+      # Auf dem Runner gibt es kein Chrome, also Playwrights eigenes Chromium.
+      - name: Chromium installieren
+        run: npx playwright install --with-deps chromium
+
+      - name: Kennzeichen pruefen
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: node watch.js
+
+      # Der Zustand muss zwischen den Laeufen erhalten bleiben - Runner sind
+      # fluechtig. Das Zurueckschreiben macht die Git-Historie nebenbei zum
+      # Protokoll darueber, wann welches Kennzeichen frei wurde.
+      - name: Stand zurueckschreiben
+        run: |
+          git config user.name  "kennzeichen-waechter[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # data/ als Ganzes: fehlende Dateien brechen nicht ab, und was in
+          # .gitignore steht (Topic, Logs, Feedback) bleibt ohnehin draussen.
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Keine Aenderung am Stand."
+          else
+            git commit -m "Stand: $(date -u '+%Y-%m-%d %H:%M') UTC [skip ci]"
+            # Ein paralleler Lauf koennte inzwischen gepusht haben.
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

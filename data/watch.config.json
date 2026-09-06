@@ -1,0 +1,44 @@
+{
+  "targets": [
+    {
+      "label": "Auto Münster",
+      "district": "ms",
+      "identifier": "MS",
+      "vehicle": "pkw",
+      "maxLength": 5,
+      "onlyPatterns": []
+    },
+    {
+      "label": "Motorrad Münster",
+      "district": "ms",
+      "identifier": "MS",
+      "vehicle": "krad",
+      "maxLength": 5,
+      "onlyPatterns": []
+    },
+    {
+      "label": "Auto Lüdinghausen",
+      "district": "coe",
+      "identifier": "LH",
+      "vehicle": "pkw",
+      "maxLength": 5,
+      "onlyPatterns": []
+    },
+    {
+      "label": "Motorrad Lüdinghausen",
+      "district": "coe",
+      "identifier": "LH",
+      "vehicle": "krad",
+      "maxLength": 5,
+      "onlyPatterns": []
+    }
+  ],
+  "notify": {
+    "macos": true,
+    "ntfy": {
+      "enabled": true,
+      "server": "https://ntfy.sh",
+      "topic": null
+    }
+  }
+}

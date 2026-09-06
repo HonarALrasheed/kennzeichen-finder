@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>de.kennzeichen-finder.watch</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/alrasheed/.nvm/versions/node/v25.9.0/bin/node</string>
+    <string>/Users/alrasheed/kennzeichen-finder/watch.js</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/alrasheed/kennzeichen-finder</string>
+
+  <!-- Dreimal taeglich. Ein Durchlauf ueber alle vier Ziele dauert rund
+       40 Sekunden und stellt etwa ein Dutzend Anfragen. War der Mac zur
+       Uhrzeit aus, holt launchd den Lauf beim naechsten Start nach. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict>
+      <key>Hour</key><integer>8</integer>
+      <key>Minute</key><integer>0</integer>
+    </dict>
+    <dict>
+      <key>Hour</key><integer>13</integer>
+      <key>Minute</key><integer>0</integer>
+    </dict>
+    <dict>
+      <key>Hour</key><integer>19</integer>
+      <key>Minute</key><integer>0</integer>
+    </dict>
+  </array>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/alrasheed/kennzeichen-finder/data/watch.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/alrasheed/kennzeichen-finder/data/watch.err.log</string>
+</dict>
+</plist>

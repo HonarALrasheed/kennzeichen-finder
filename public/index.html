@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kennzeichen-Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;900&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="glow" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="wordmark">
+    <span class="wordmark__dot"></span>
+    Kennzeichen<span class="wordmark__thin">Finder</span>
+  </div>
+  <div class="topbar__meta" id="topMeta">Live-Abfrage im Behördenportal</div>
+</header>
+
+<main class="shell">
+
+  <!-- ─────────── 01 Setup ─────────── -->
+  <section class="block block--hero">
+    <p class="eyebrow"><span>01</span> Zulassungsstelle</p>
+    <h1 class="display">
+      Das kürzeste<br>
+      <em>freie</em> Kennzeichen.
+    </h1>
+    <p class="lede">
+      Acht Suchmuster, ein Durchlauf, live im echten Portal deiner Zulassungsstelle.
+      Sortiert nach Länge — nicht nach dem, was du zufällig eintippst.
+    </p>
+
+    <div class="setup">
+      <div class="setup__fields">
+        <label class="field">
+          <span class="field__label">Bezirk</span>
+          <select id="district"></select>
+        </label>
+        <label class="field">
+          <span class="field__label">Kürzel</span>
+          <select id="identifier"></select>
+        </label>
+        <label class="field">
+          <span class="field__label">Fahrzeugart</span>
+          <select id="vehicle">
+            <option value="pkw">PKW / LKW / Wohnmobil</option>
+            <option value="krad">Motorrad</option>
+          </select>
+        </label>
+      </div>
+
+      <details class="custom">
+        <summary>Andere Zulassungsstelle eintragen</summary>
+        <p class="custom__hint">
+          Dasselbe Portalsystem läuft bei vielen Kreisen unter <code>/wkz/</code>.
+          Trag die Startadresse ein, z.&nbsp;B.
+          <code>https://www.stadt-muenster.de/wkz/?LICENSEIDENTIFIER=ms</code>
+        </p>
+        <label class="field">
+          <span class="field__label">Portal-URL</span>
+          <input type="url" id="customUrl" placeholder="https://…/wkz/?LICENSEIDENTIFIER=xx">
+        </label>
+      </details>
+
+      <div class="launch">
+        <button id="start" class="btn">
+          <span class="btn__label">Scan starten</span>
+          <span class="btn__arrow" aria-hidden="true">→</span>
+        </button>
+        <span class="launch__note" id="scanNote">8 Anfragen · ca. 30–60 Sekunden</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── 02 Fortschritt ─────────── -->
+  <section class="block" id="progressCard" hidden>
+    <p class="eyebrow"><span>02</span> Durchlauf</p>
+    <div class="meter"><div class="meter__fill" id="barFill"></div></div>
+    <ul class="log" id="log"></ul>
+  </section>
+
+  <!-- ─────────── 03 Ergebnis ─────────── -->
+  <div id="output" hidden>
+
+    <section class="block verdict">
+      <p class="eyebrow"><span>03</span> Auswertung</p>
+      <div class="verdict__grid">
+        <div class="verdict__figure">
+          <span class="verdict__num" id="verdictLen">–</span>
+          <span class="verdict__unit">Zeichen</span>
+        </div>
+        <div class="verdict__prose">
+          <h2 id="verdictHead"></h2>
+          <p id="verdictText"></p>
+          <p class="rarity" id="rarity"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <p class="eyebrow"><span>04</span> Empfehlung</p>
+      <div class="hero-pick" id="heroPick"></div>
+      <ol class="picks" id="picks"></ol>
+    </section>
+
+    <section class="block">
+      <p class="eyebrow"><span>05</span> Alle Muster</p>
+      <p class="section-note">Aufsteigend nach Gesamtlänge des fertigen Kennzeichens.</p>
+      <div class="formats" id="formats"></div>
+    </section>
+
+    <section class="block">
+      <p class="eyebrow"><span>06</span> Feedback</p>
+      <p class="section-note">
+        Wie brauchbar war das Ergebnis? Wird lokal in <code>data/feedback.json</code> gespeichert.
+      </p>
+      <form id="feedbackForm" class="fb">
+        <div class="stars" id="stars" role="radiogroup" aria-label="Bewertung"></div>
+        <label class="field">
+          <span class="field__label">Kommentar</span>
+          <textarea id="fbMessage" rows="4" maxlength="4000"
+            placeholder="Was war hilfreich, was hat gefehlt?"></textarea>
+        </label>
+        <div class="launch">
+          <button type="submit" class="btn btn--ghost">
+            <span class="btn__label">Feedback senden</span>
+          </button>
+          <span class="launch__note" id="fbNote"></span>
+        </div>
+      </form>
+      <div id="fbList" class="fb-list"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="foot">
+  <p>
+    Abfragen laufen gegen das öffentliche Selbstauskunft-Formular der jeweiligen
+    Zulassungsstelle — ein Scan gleichzeitig, mit Pause zwischen den Anfragen.
+    <strong>Reserviert wird hier nichts.</strong> Das machst du im Portal selbst.
+  </p>
+</footer>
+
+<script src="/app.js" type="module"></script>
+</body>
+</html>
