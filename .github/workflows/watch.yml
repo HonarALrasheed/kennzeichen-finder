@@ -1,15 +1,22 @@
 name: Kennzeichen-Wächter
 
-# Prueft dreimal taeglich, ob in Muenster oder Luedinghausen ein kurzes
-# Kennzeichen frei geworden ist, und schickt bei Aenderung eine Push-Meldung.
+# Prueft, ob in Muenster oder Luedinghausen ein kurzes Kennzeichen frei
+# geworden ist, und schickt bei Aenderung eine Push-Meldung.
 #
-# Die Zeiten sind UTC. Im Sommer (CEST) entspricht das 08:00 / 13:00 / 19:00,
-# im Winter (CET) einer Stunde frueher. GitHub startet geplante Laeufe unter
-# Last gerne mit einigen Minuten Verspaetung - fuer diesen Zweck egal.
+# Zeiten sind UTC, im Sommer also eine Stunde vor deutscher Zeit.
+# Kennzeichen werden frei, wenn jemand ein Fahrzeug abmeldet - das laeuft ueber
+# die Zulassungsstelle und damit werktags zu Bueroezeiten. Deshalb tagsueber
+# alle 30 Minuten und am Wochenende nur einmal, statt rund um die Uhr Anfragen
+# gegen ein Behoerdenportal zu schicken, wo ohnehin nichts passieren kann.
+#
+# Kuerzer als 5 Minuten laesst GitHub nicht zu, und geplante Laeufe starten
+# unter Last regelmaessig einige Minuten spaeter - manche fallen ganz aus.
+# Der Zeitplan ist also eine Obergrenze, keine Zusage.
 on:
   schedule:
-    - cron: '0 6,11,17 * * *'
-  workflow_dispatch:        # Knopf zum manuellen Ausloesen
+    - cron: '*/30 6-16 * * 1-5'   # Mo-Fr, 08:00-18:00 deutscher Zeit
+    - cron: '0 10 * * 6,0'        # Sa+So einmal mittags
+  workflow_dispatch:              # Knopf zum manuellen Ausloesen
 
 # Der Lauf schreibt den erkannten Stand zurueck ins Repo.
 permissions:
@@ -39,6 +46,15 @@ jobs:
       - name: Abhaengigkeiten installieren
         run: npm ci --omit=dev
 
+      # Bei rund 20 Laeufen am Tag lohnt sich der Zwischenspeicher: Chromium
+      # sind gut 100 MB, die sonst jedes Mal neu geladen wuerden.
+      - name: Chromium aus dem Zwischenspeicher
+        id: chromium-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
       # Auf dem Runner gibt es kein Chrome, also Playwrights eigenes Chromium.
       - name: Chromium installieren
         run: npx playwright install --with-deps chromium
@@ -49,20 +65,33 @@ jobs:
         run: node watch.js
 
       # Der Zustand muss zwischen den Laeufen erhalten bleiben - Runner sind
-      # fluechtig. Das Zurueckschreiben macht die Git-Historie nebenbei zum
-      # Protokoll darueber, wann welches Kennzeichen frei wurde.
+      # fluechtig. Ohne das gaebe es jedes Mal einen leeren Ausgangszustand
+      # und damit nie eine Erkennung.
+      #
+      # Committet wird nur bei echter Aenderung. Der Zeitstempel liegt bewusst
+      # in einer ignorierten Datei, sonst gaebe es bei ~20 Laeufen am Tag
+      # ebenso viele leere Commits. Zusaetzlich alle 14 Tage ein Lebenszeichen:
+      # GitHub schaltet geplante Workflows nach 60 Tagen ohne Repo-Aktivitaet ab.
       - name: Stand zurueckschreiben
         run: |
           git config user.name  "kennzeichen-waechter[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # data/ als Ganzes: fehlende Dateien brechen nicht ab, und was in
-          # .gitignore steht (Topic, Logs, Feedback) bleibt ohnehin draussen.
+          # .gitignore steht (Topic, Zeitstempel, Logs) bleibt draussen.
           git add data/
-          if git diff --staged --quiet; then
-            echo "Keine Aenderung am Stand."
+
+          letzter=$(git log -1 --format=%ct)
+          alter_tage=$(( ( $(date +%s) - letzter ) / 86400 ))
+
+          if ! git diff --staged --quiet; then
+            git commit -m "Stand geaendert: $(date -u '+%Y-%m-%d %H:%M') UTC [skip ci]"
+          elif [ "$alter_tage" -ge 14 ]; then
+            git commit --allow-empty -m "Lebenszeichen: seit ${alter_tage} Tagen unveraendert [skip ci]"
           else
-            git commit -m "Stand: $(date -u '+%Y-%m-%d %H:%M') UTC [skip ci]"
-            # Ein paralleler Lauf koennte inzwischen gepusht haben.
-            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
+            echo "Keine Aenderung, letzter Commit vor ${alter_tage} Tagen - nichts zu tun."
+            exit 0
           fi
+
+          # Ein paralleler Lauf koennte inzwischen gepusht haben.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

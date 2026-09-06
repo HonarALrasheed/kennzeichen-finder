@@ -26,6 +26,9 @@ const CONFIG_FILE = path.join(DATA, 'watch.config.json');
 const LOCAL_FILE = path.join(DATA, 'watch.local.json');
 const STATE_FILE = path.join(DATA, 'watch.state.json');
 const LOG_FILE = path.join(DATA, 'watch.log.ndjson');
+// Wann zuletzt geprueft wurde, gehoert nicht in den eingecheckten Zustand -
+// sonst unterscheidet sich die Datei nach jedem Lauf und erzeugt einen Commit.
+const LASTRUN_FILE = path.join(DATA, 'watch.lastrun.json');
 
 const INIT = process.argv.includes('--init');
 const TEST_PUSH = process.argv.includes('--test-push');
@@ -161,7 +164,6 @@ async function checkTarget(target, state) {
 
   state[key] = {
     plates: [...currentSet].sort(),
-    checkedAt: new Date().toISOString(),
     total: current.length,
   };
 
@@ -249,6 +251,10 @@ for (const target of cfg.targets) {
 }
 
 await writeJson(STATE_FILE, state);
+await writeJson(LASTRUN_FILE, {
+  at: new Date().toISOString(),
+  ziele: Object.fromEntries(Object.entries(state).map(([k, v]) => [k, v.total])),
+});
 
 // GitHub Actions zeigt diese Datei als Zusammenfassung des Laufs an.
 if (process.env.GITHUB_STEP_SUMMARY) {

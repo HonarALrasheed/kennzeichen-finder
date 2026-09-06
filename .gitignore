@@ -3,6 +3,9 @@ node_modules/
 # Enthaelt das ntfy-Topic. In der Cloud kommt es aus einem GitHub-Secret.
 data/watch.local.json
 
+# Wann zuletzt geprueft wurde - aendert sich bei jedem Lauf
+data/watch.lastrun.json
+
 # Laufzeitausgaben von launchd
 data/watch.out.log
 data/watch.err.log
