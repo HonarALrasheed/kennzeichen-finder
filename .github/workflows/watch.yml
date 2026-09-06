@@ -16,10 +16,15 @@ on:
   schedule:
     - cron: '*/30 6-16 * * 1-5'   # Mo-Fr, 08:00-18:00 deutscher Zeit
     - cron: '0 10 * * 6,0'        # Sa+So einmal mittags
+    - cron: '0 18 * * *'          # taeglich 20:00 deutscher Zeit: Tagesbericht
   workflow_dispatch:              # Knopf zum manuellen Ausloesen
     inputs:
       test_push:
         description: 'Test-Meldung ans Handy schicken (prueft die ganze Kette)'
+        type: boolean
+        default: false
+      digest:
+        description: 'Tagesbericht schicken, auch wenn sich nichts geaendert hat'
         type: boolean
         default: false
 
@@ -85,10 +90,20 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: node watch.js --test-push
 
+      # Der Abendlauf schickt zusaetzlich den Tagesbericht - der meldet sich
+      # auch dann, wenn nichts passiert ist, damit stilles Versagen auffaellt.
       - name: Kennzeichen pruefen
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
-        run: node watch.js
+          ZEITPLAN: ${{ github.event.schedule }}
+          BERICHT: ${{ inputs.digest }}
+        run: |
+          if [ "$ZEITPLAN" = "0 18 * * *" ] || [ "$BERICHT" = "true" ]; then
+            echo "Lauf mit Tagesbericht"
+            node watch.js --digest
+          else
+            node watch.js
+          fi
 
       # Der Zustand muss zwischen den Laeufen erhalten bleiben - Runner sind
       # fluechtig. Ohne das gaebe es jedes Mal einen leeren Ausgangszustand

@@ -32,6 +32,8 @@ const LASTRUN_FILE = path.join(DATA, 'watch.lastrun.json');
 
 const INIT = process.argv.includes('--init');
 const TEST_PUSH = process.argv.includes('--test-push');
+// Tagesbericht: meldet sich auch dann, wenn sich nichts getan hat.
+const DIGEST = process.argv.includes('--digest');
 
 // Ein zufälliges ntfy-Topic. Topics sind öffentlich, wer den Namen kennt, liest
 // mit - deshalb lang und geraten unmöglich. Inhalt sind ohnehin nur freie
@@ -98,24 +100,34 @@ async function notifyMac(title, message) {
 
 // Push aufs Handy über ntfy.sh. Fehler hier dürfen den Lauf nicht abbrechen -
 // die Erkennung ist wichtiger als die Zustellung.
-async function notifyPhone(cfg, title, message, priority = 'default') {
+async function notifyPhone(cfg, title, message, priority = 'default', extra = {}) {
   const n = cfg.notify?.ntfy ?? {};
   // In der Cloud kommt das Topic aus einem Secret, nicht aus der Datei.
   const topic = process.env.NTFY_TOPIC || n.topic;
   const server = process.env.NTFY_SERVER || n.server || 'https://ntfy.sh';
   if (!topic || (n.enabled === false && !process.env.NTFY_TOPIC)) return { skipped: true };
-  const url = `${server.replace(/\/+$/, '')}/${topic}`;
+
+  // Bewusst die JSON-Schnittstelle statt der Kopfzeilen-Variante: HTTP-Header
+  // dürfen nur Latin-1 enthalten, und Bezirksnamen wie "Coesfeld (… )" oder
+  // schlicht Umlaute im Titel würden daran scheitern oder falsch ankommen.
+  const STUFE = { min: 1, low: 2, default: 3, high: 4, urgent: 5, max: 5 };
+
   try {
-    const res = await fetch(url, {
+    const res = await fetch(server.replace(/\/+$/, ''), {
       method: 'POST',
-      headers: {
-        Title: title,
-        Priority: priority,
-        Tags: 'car,bell',
-      },
-      body: message,
+      headers: { 'content-type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        topic,
+        title,
+        message,
+        priority: STUFE[priority] ?? 3,
+        tags: (extra.tags || 'car,bell').split(',').map((t) => t.trim()),
+        ...(extra.click ? { click: extra.click } : {}),
+        ...(extra.actions?.length ? { actions: extra.actions } : {}),
+      }),
     });
-    return { ok: res.ok, status: res.status };
+    if (!res.ok) return { ok: false, status: res.status, text: (await res.text()).slice(0, 200) };
+    return { ok: true, status: res.status };
   } catch (err) {
     return { ok: false, error: err.message };
   }
@@ -170,6 +182,118 @@ async function checkTarget(target, state) {
   return { target, scan, current, appeared, gone, isFirstRun };
 }
 
+/* ── Tagesbericht ─────────────────────────────────────────
+   Meldet sich einmal täglich, auch wenn nichts passiert ist:
+   Was ist frei, wo, und lief alles fehlerfrei. */
+
+function aendrungenHeute(logText) {
+  const heute = new Date().toISOString().slice(0, 10);
+  return logText
+    .split('\n')
+    .filter(Boolean)
+    .map((z) => {
+      try {
+        return JSON.parse(z);
+      } catch {
+        return null;
+      }
+    })
+    .filter((e) => e && e.at?.startsWith(heute) && e.appeared?.length);
+}
+
+async function sendeTagesbericht(cfg, ergebnisse) {
+  const zeilen = [];
+  const probleme = [];
+
+  // Ziele nach Bezirk buendeln - "Auto Muenster" und "Motorrad Muenster"
+  // gehoeren in denselben Block.
+  const bezirke = new Map();
+  for (const r of ergebnisse) {
+    if (r.fehler) {
+      probleme.push(`${r.target.label}: ${r.fehler}`);
+      continue;
+    }
+    const d = r.target.district ? findDistrict(r.target.district) : null;
+    const schluessel = `${d?.shortName || d?.name || r.target.label} · ${r.target.identifier}`;
+    if (!bezirke.has(schluessel)) {
+      bezirke.set(schluessel, { eintraege: [], plates: new Set(), url: d?.reserveUrl });
+    }
+    const b = bezirke.get(schluessel);
+    b.eintraege.push({
+      art: r.target.vehicle === 'krad' ? 'Motorrad' : 'Auto',
+      anzahl: r.current.length,
+      max: r.target.maxLength,
+    });
+    for (const p of r.current) b.plates.add(p.plate);
+
+    // Muster, an denen das Portal scheitert, gehoeren in den Bericht.
+    for (const m of r.scan?.results ?? []) {
+      if (m.status === 'failed' || m.status === 'timeout') {
+        probleme.push(`${r.target.label}: ${m.label} — Portal hat abgebrochen`);
+      }
+    }
+  }
+
+  const heute = aendrungenHeute(await fs.readFile(LOG_FILE, 'utf8').catch(() => ''));
+  zeilen.push(
+    heute.length
+      ? `Heute neu frei: ${[...new Set(heute.flatMap((e) => e.appeared))].join(', ')}`
+      : 'Heute nichts Neues frei geworden.'
+  );
+  zeilen.push('');
+
+  for (const [name, b] of bezirke) {
+    zeilen.push(name.toUpperCase());
+    for (const e of b.eintraege) {
+      zeilen.push(`  ${e.art.padEnd(9)}${e.anzahl} frei ab ${e.max} Zeichen`);
+    }
+    const beste = rankPlates(
+      [...b.plates].map((pl) => {
+        const m = pl.match(/^([A-ZÄÖÜ]{1,3})-([A-Z]{1,2}) (\d{1,4})$/);
+        return m ? { identifier: m[1], letters: m[2], digits: m[3], plate: pl } : null;
+      }).filter(Boolean)
+    ).slice(0, 3);
+    if (beste.length) zeilen.push(`  → ${beste.map((p) => p.plate).join(' · ')}`);
+    zeilen.push('');
+  }
+
+  const anzahlZiele = ergebnisse.length;
+  zeilen.push(
+    probleme.length
+      ? `${probleme.length} Auffälligkeit(en):\n` + probleme.map((p) => `  · ${p}`).join('\n')
+      : `Alle ${anzahlZiele} Prüfungen fehlerfrei.`
+  );
+
+  // Knoepfe zum Reservieren, hoechstens drei erlaubt ntfy.
+  const links = [...bezirke.values()].map((b) => b.url).filter(Boolean);
+  const actions = [...bezirke.entries()]
+    .filter(([, b]) => b.url)
+    .slice(0, 3)
+    .map(([name, b]) => ({
+      action: 'view',
+      // Knopfbeschriftung kurz halten, sonst bricht sie auf dem Handy um.
+      label: name.split(' · ')[0].replace(/^(Stadt|Kreis) /, ''),
+      url: b.url,
+    }));
+
+  const datum = new Date().toLocaleDateString('de-DE', {
+    weekday: 'short', day: '2-digit', month: '2-digit',
+    timeZone: 'Europe/Berlin',
+  });
+
+  return notifyPhone(
+    cfg,
+    probleme.length ? `Tagesbericht ${datum} · Achtung` : `Tagesbericht ${datum} · alles läuft`,
+    zeilen.join('\n'),
+    'low',
+    {
+      tags: probleme.length ? 'warning' : 'white_check_mark',
+      click: links[0],
+      actions,
+    }
+  );
+}
+
 const config = await readJson(CONFIG_FILE, null);
 if (!config) {
   await writeJson(CONFIG_FILE, DEFAULT_CONFIG);
@@ -205,10 +329,13 @@ const stamp = new Date().toLocaleString('de-DE');
 console.log(`\n[${stamp}] Beobachtung läuft — ${cfg.targets.length} Ziel(e)\n`);
 
 const findings = [];
+const runResults = [];
 
 for (const target of cfg.targets) {
   try {
     const res = await checkTarget(target, state);
+
+    runResults.push(res);
 
     if (res.isFirstRun || INIT) {
       console.log(`  ${target.label}: Ausgangszustand gesetzt — ${res.current.length} Kennzeichen ≤ ${target.maxLength} Zeichen`);
@@ -247,6 +374,7 @@ for (const target of cfg.targets) {
     );
   } catch (err) {
     console.log(`  ${target.label}: FEHLER — ${err.message}`);
+    runResults.push({ target, fehler: err.message });
   }
 }
 
@@ -255,6 +383,11 @@ await writeJson(LASTRUN_FILE, {
   at: new Date().toISOString(),
   ziele: Object.fromEntries(Object.entries(state).map(([k, v]) => [k, v.total])),
 });
+
+if (DIGEST) {
+  const r = await sendeTagesbericht(cfg, runResults.filter((x) => x.current || x.fehler));
+  console.log(r.ok ? '  Tagesbericht ans Handy gesendet' : `  Tagesbericht fehlgeschlagen: ${r.error || r.status}`);
+}
 
 // GitHub Actions zeigt diese Datei als Zusammenfassung des Laufs an.
 if (process.env.GITHUB_STEP_SUMMARY) {

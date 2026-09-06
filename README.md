@@ -155,6 +155,36 @@ Auto und Motorrad teilen sich denselben Kennzeichen-Pool. Taucht ein Schild bei
 mehreren Zielen auf, kommt trotzdem nur **eine** Meldung. Bei vier Zeichen
 (`MS-A 1`, in Münster der Sonderfall) geht die Meldung mit Priorität `urgent` raus.
 
+### Tagesbericht
+
+Einmal täglich um 20:00 Uhr kommt eine Meldung — auch wenn nichts passiert ist.
+Genau das ist der Zweck: Bleibt sie aus, weißt du, dass etwas klemmt.
+
+```
+Tagesbericht So., 06.09. · alles läuft
+
+Heute nichts Neues frei geworden.
+
+MÜNSTER · MS
+  Auto     25 frei ab 5 Zeichen
+  Motorrad 25 frei ab 5 Zeichen
+  → MS-UZ 5 · MS-UZ 8 · MS-ZC 5
+
+KREIS COESFELD · LH
+  Auto     2 frei ab 5 Zeichen
+  Motorrad 2 frei ab 5 Zeichen
+  → LH-U 54 · LH-U 79
+
+Alle 4 Prüfungen fehlerfrei.
+
+[ Münster ]  [ Coesfeld ]      ← Knöpfe direkt zum Reservieren
+```
+
+Läuft etwas schief — ein Portal bricht ab, ein Ziel wirft einen Fehler — steht
+das statt „fehlerfrei" im Bericht, und die Meldung kommt mit Warnsymbol.
+
+Von Hand auslösen: `node watch.js --digest`
+
 ### In der Cloud laufen lassen (GitHub Actions)
 
 Unabhängig davon, ob dein Mac läuft. `.github/workflows/watch.yml` prüft dreimal
@@ -169,8 +199,13 @@ täglich und schickt bei Änderung den Push.
    secret** anlegen:
    - Name: `NTFY_TOPIC`
    - Wert: das Topic aus `data/watch.local.json`
-3. Unter **Actions** den Workflow einmal über **Run workflow** starten und
-   zusehen, ob er durchläuft.
+3. Unter **Actions** den Workflow über **Run workflow** starten. Zwei Schalter
+   stehen dort zur Verfügung:
+   - *Test-Meldung ans Handy schicken* — prüft die Zustellung bis aufs Gerät
+   - *Tagesbericht schicken* — zeigt, wie der Abendbericht aussieht
+
+Fehlt das Secret, bricht der Lauf mit klarer Fehlermeldung ab statt still grün
+durchzulaufen — sonst wäre der gefährlichste Fehler der unsichtbare.
 
 Das Topic liegt bewusst nur im Secret und in der lokal ignorierten Datei
 `data/watch.local.json` — die eingecheckte Konfiguration enthält es nicht.
