@@ -17,6 +17,11 @@ on:
     - cron: '*/30 6-16 * * 1-5'   # Mo-Fr, 08:00-18:00 deutscher Zeit
     - cron: '0 10 * * 6,0'        # Sa+So einmal mittags
   workflow_dispatch:              # Knopf zum manuellen Ausloesen
+    inputs:
+      test_push:
+        description: 'Test-Meldung ans Handy schicken (prueft die ganze Kette)'
+        type: boolean
+        default: false
 
 # Der Lauf schreibt den erkannten Stand zurueck ins Repo.
 permissions:
@@ -58,6 +63,27 @@ jobs:
       # Auf dem Runner gibt es kein Chrome, also Playwrights eigenes Chromium.
       - name: Chromium installieren
         run: npx playwright install --with-deps chromium
+
+      # Ohne Secret laeuft alles gruen durch, es kaeme nur nie eine Meldung an.
+      # Dieser stille Fehler waere der gefaehrlichste - deshalb hier laut.
+      - name: Secret pruefen
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          if [ -z "$NTFY_TOPIC" ]; then
+            echo "::error::Secret NTFY_TOPIC fehlt - es kaeme keine Meldung aufs Handy an."
+            echo "Anlegen unter: Settings -> Secrets and variables -> Actions"
+            exit 1
+          fi
+          echo "NTFY_TOPIC ist gesetzt (${#NTFY_TOPIC} Zeichen)."
+
+      # Auf Knopfdruck: beweist Zustellung bis aufs Handy, ohne auf ein
+      # wirklich frei werdendes Kennzeichen warten zu muessen.
+      - name: Test-Meldung schicken
+        if: inputs.test_push
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: node watch.js --test-push
 
       - name: Kennzeichen pruefen
         env:
