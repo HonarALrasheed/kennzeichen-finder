@@ -161,24 +161,47 @@ Einmal täglich um 20:00 Uhr kommt eine Meldung — auch wenn nichts passiert is
 Genau das ist der Zweck: Bleibt sie aus, weißt du, dass etwas klemmt.
 
 ```
-Tagesbericht So., 06.09. · alles läuft
+Tagesbericht Mi., 09.09. · alles läuft
 
-Heute nichts Neues frei geworden.
+Heute 46 neu frei, darunter:
+  LH-A 65 · LH-B 19 · LH-D 11 · LH-D 39 · LH-D 92 · LH-E 69 …
 
 MÜNSTER · MS
-  Auto     25 frei ab 5 Zeichen
-  Motorrad 25 frei ab 5 Zeichen
-  → MS-UZ 5 · MS-UZ 8 · MS-ZC 5
+  Auto     21 frei ab 5 Zeichen
+  Motorrad 21 frei ab 5 Zeichen
+
+  MS-NQ  9
+  MS-QC  6  8
+  MS-QK  4
+  …
+
+  Empfehlung: MS-UY 9
+  beste verbleibende Wahl — derzeit ist hier nichts ohne I/O/Q/X/Y frei
 
 KREIS COESFELD · LH
-  Auto     2 frei ab 5 Zeichen
-  Motorrad 2 frei ab 5 Zeichen
-  → LH-U 54 · LH-U 79
+  Auto     48 frei ab 5 Zeichen
+  (dazu über 100 weitere mit 2 Buchstaben + 1 Ziffer)
+
+  LH-D  11  39  92
+  LH-P  13  35  50  79  80
+  …
+
+  Empfehlung: LH-D 11
+  nur ein Buchstabe — die seltenste Variante, gleiche Ziffern
 
 Alle 4 Prüfungen fehlerfrei.
 
 [ Münster ]  [ Coesfeld ]      ← Knöpfe direkt zum Reservieren
 ```
+
+Aufgeführt werden **alle** verfolgten Kennzeichen, nach Vorsilbe gebündelt —
+`LH-D 11 39 92` statt drei einzelner Zeilen, sonst wird die Liste auf einem
+Handydisplay unlesbar. Muster mit über 100 freien Kombinationen verfolgt der
+Wächter nicht einzeln; dass es sie gibt, steht trotzdem im Bericht.
+
+Die Empfehlung ist der bestbewertete Treffer mit Begründung. Ist ohnehin nichts
+Unauffälliges mehr frei, sagt der Bericht genau das — statt ein Kennzeichen zu
+empfehlen und im selben Satz zu bemängeln.
 
 Läuft etwas schief — ein Portal bricht ab, ein Ziel wirft einen Fehler — steht
 das statt „fehlerfrei" im Bericht, und die Meldung kommt mit Warnsymbol.

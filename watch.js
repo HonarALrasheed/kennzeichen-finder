@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 import { findDistrict } from './lib/districts.js';
 import { scanDistrict } from './lib/wkz.js';
-import { plateLength, rankPlates } from './lib/score.js';
+import { plateLength, rankPlates, pickReason } from './lib/score.js';
 
 const run = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -216,7 +216,9 @@ async function sendeTagesbericht(cfg, ergebnisse) {
     const d = r.target.district ? findDistrict(r.target.district) : null;
     const schluessel = `${d?.shortName || d?.name || r.target.label} · ${r.target.identifier}`;
     if (!bezirke.has(schluessel)) {
-      bezirke.set(schluessel, { eintraege: [], plates: new Set(), url: d?.reserveUrl });
+      bezirke.set(schluessel, {
+        eintraege: [], plates: new Set(), gedeckelt: new Set(), url: d?.reserveUrl,
+      });
     }
     const b = bezirke.get(schluessel);
     b.eintraege.push({
@@ -225,6 +227,12 @@ async function sendeTagesbericht(cfg, ergebnisse) {
       max: r.target.maxLength,
     });
     for (const p of r.current) b.plates.add(p.plate);
+
+    // Muster mit "100+" werden nicht einzeln verfolgt - im Bericht aber
+    // erwaehnt, damit die Liste nicht vollstaendiger wirkt als sie ist.
+    for (const m of r.scan?.results ?? []) {
+      if (m.capped) b.gedeckelt.add(m.label);
+    }
 
     // Muster, an denen das Portal scheitert, gehoeren in den Bericht.
     for (const m of r.scan?.results ?? []) {
@@ -235,11 +243,16 @@ async function sendeTagesbericht(cfg, ergebnisse) {
   }
 
   const heute = aendrungenHeute(await fs.readFile(LOG_FILE, 'utf8').catch(() => ''));
-  zeilen.push(
-    heute.length
-      ? `Heute neu frei: ${[...new Set(heute.flatMap((e) => e.appeared))].join(', ')}`
-      : 'Heute nichts Neues frei geworden.'
-  );
+  const heuteNeu = [...new Set(heute.flatMap((e) => e.appeared))];
+  if (heuteNeu.length > 8) {
+    // Sammelfreigaben koennen dutzende Kennzeichen auf einmal bringen.
+    zeilen.push(`Heute ${heuteNeu.length} neu frei, darunter:`);
+    zeilen.push(`  ${heuteNeu.slice(0, 6).join(' · ')} …`);
+  } else if (heuteNeu.length) {
+    zeilen.push(`Heute neu frei: ${heuteNeu.join(' · ')}`);
+  } else {
+    zeilen.push('Heute nichts Neues frei geworden.');
+  }
   zeilen.push('');
 
   for (const [name, b] of bezirke) {
@@ -247,14 +260,44 @@ async function sendeTagesbericht(cfg, ergebnisse) {
     for (const e of b.eintraege) {
       zeilen.push(`  ${e.art.padEnd(9)}${e.anzahl} frei ab ${e.max} Zeichen`);
     }
-    const beste = rankPlates(
-      [...b.plates].map((pl) => {
-        const m = pl.match(/^([A-ZÄÖÜ]{1,3})-([A-Z]{1,2}) (\d{1,4})$/);
-        return m ? { identifier: m[1], letters: m[2], digits: m[3], plate: pl } : null;
-      }).filter(Boolean)
-    ).slice(0, 3);
-    if (beste.length) zeilen.push(`  → ${beste.map((p) => p.plate).join(' · ')}`);
+    const zerlegt = [...b.plates].map((pl) => {
+      const m = pl.match(/^([A-ZÄÖÜ]{1,3})-([A-Z]{1,2}) (\d{1,4})$/);
+      return m ? { identifier: m[1], letters: m[2], digits: m[3], plate: pl } : null;
+    }).filter(Boolean);
+
+    if (b.gedeckelt.size) {
+      zeilen.push(`  (dazu über 100 weitere mit ${[...b.gedeckelt].join(' bzw. ')})`);
+    }
     zeilen.push('');
+
+    // Nach Vorsilbe buendeln: "LH-D 11 39 92" statt drei einzelner Zeilen.
+    // Auf einem Handydisplay ist das der Unterschied zwischen lesbar und nicht.
+    const nachVorsilbe = new Map();
+    for (const p of zerlegt.sort((a, z) => a.plate.localeCompare(z.plate))) {
+      const v = `${p.identifier}-${p.letters}`;
+      if (!nachVorsilbe.has(v)) nachVorsilbe.set(v, []);
+      nachVorsilbe.get(v).push(p.digits);
+    }
+    for (const [v, ziffern] of nachVorsilbe) {
+      zeilen.push(`  ${v}  ${ziffern.join('  ')}`);
+    }
+    zeilen.push('');
+
+    const beste = rankPlates(zerlegt)[0];
+    if (beste) {
+      zeilen.push(`  Empfehlung: ${beste.plate}`);
+      // Wenn ohnehin nichts Unauffaelliges mehr frei ist, waere "Buchstabe Y
+      // faellt aus dem Rahmen" als Begruendung fuer eine Empfehlung
+      // widerspruechlich. Dann lieber ehrlich sagen, woran es liegt.
+      const sperrig = /[IOQXY]/;
+      const gibtSauberes = zerlegt.some((p) => !sperrig.test(p.letters));
+      zeilen.push(
+        sperrig.test(beste.letters) && !gibtSauberes
+          ? '  beste verbleibende Wahl — derzeit ist hier nichts ohne I/O/Q/X/Y frei'
+          : `  ${pickReason(beste)}`
+      );
+      zeilen.push('');
+    }
   }
 
   const anzahlZiele = ergebnisse.length;
@@ -281,10 +324,16 @@ async function sendeTagesbericht(cfg, ergebnisse) {
     timeZone: 'Europe/Berlin',
   });
 
+  let text = zeilen.join('\n');
+  // ntfy nimmt maximal 4096 Byte im Nachrichtentext.
+  if (Buffer.byteLength(text, 'utf8') > 3800) {
+    text = text.slice(0, 3600) + '\n\n… gekürzt, vollständige Liste im Portal.';
+  }
+
   return notifyPhone(
     cfg,
     probleme.length ? `Tagesbericht ${datum} · Achtung` : `Tagesbericht ${datum} · alles läuft`,
-    zeilen.join('\n'),
+    text,
     'low',
     {
       tags: probleme.length ? 'warning' : 'white_check_mark',
