@@ -49,7 +49,6 @@
   },
   "Auto Lüdinghausen": {
     "plates": [
-      "LH-A 65",
       "LH-D 39",
       "LH-D 92",
       "LH-E 69",
@@ -68,7 +67,6 @@
       "LH-Q 58",
       "LH-Q 97",
       "LH-S 49",
-      "LH-T 32",
       "LH-U 12",
       "LH-U 17",
       "LH-U 19",
@@ -84,11 +82,10 @@
       "LH-Z 26",
       "LH-Z 91"
     ],
-    "total": 34
+    "total": 32
   },
   "Motorrad Lüdinghausen": {
     "plates": [
-      "LH-A 65",
       "LH-D 39",
       "LH-D 92",
       "LH-E 69",
@@ -107,7 +104,6 @@
       "LH-Q 58",
       "LH-Q 97",
       "LH-S 49",
-      "LH-T 32",
       "LH-U 12",
       "LH-U 17",
       "LH-U 19",
@@ -123,6 +119,6 @@
       "LH-Z 26",
       "LH-Z 91"
     ],
-    "total": 34
+    "total": 32
   }
 }
