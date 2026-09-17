@@ -50,8 +50,6 @@
   "Auto Lüdinghausen": {
     "plates": [
       "LH-D 39",
-      "LH-D 92",
-      "LH-E 69",
       "LH-G 52",
       "LH-H 69",
       "LH-H 71",
@@ -81,13 +79,11 @@
       "LH-Z 26",
       "LH-Z 91"
     ],
-    "total": 31
+    "total": 29
   },
   "Motorrad Lüdinghausen": {
     "plates": [
       "LH-D 39",
-      "LH-D 92",
-      "LH-E 69",
       "LH-G 52",
       "LH-H 69",
       "LH-H 71",
@@ -117,6 +113,6 @@
       "LH-Z 26",
       "LH-Z 91"
     ],
-    "total": 31
+    "total": 29
   }
 }
