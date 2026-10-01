@@ -50,7 +50,6 @@
       "LH-Q 38",
       "LH-Q 97",
       "LH-U 12",
-      "LH-U 17",
       "LH-U 19",
       "LH-U 54",
       "LH-U 79",
@@ -60,7 +59,7 @@
       "LH-Y 89",
       "LH-Z 26"
     ],
-    "total": 16
+    "total": 15
   },
   "Motorrad Lüdinghausen": {
     "plates": [
@@ -71,7 +70,6 @@
       "LH-Q 38",
       "LH-Q 97",
       "LH-U 12",
-      "LH-U 17",
       "LH-U 19",
       "LH-U 54",
       "LH-U 79",
@@ -81,6 +79,6 @@
       "LH-Y 89",
       "LH-Z 26"
     ],
-    "total": 16
+    "total": 15
   }
 }
