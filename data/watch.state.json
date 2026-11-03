@@ -35,15 +35,16 @@
     "plates": [
       "LH-A 33",
       "LH-A 98",
-      "LH-B 26",
       "LH-B 98",
       "LH-C 51",
       "LH-C 68",
+      "LH-C 78",
       "LH-C 80",
       "LH-C 90",
       "LH-F 27",
       "LH-F 90",
       "LH-G 19",
+      "LH-G 21",
       "LH-G 44",
       "LH-G 52",
       "LH-G 83",
@@ -68,6 +69,7 @@
       "LH-Q 42",
       "LH-Q 95",
       "LH-Q 97",
+      "LH-R 51",
       "LH-R 89",
       "LH-S 72",
       "LH-S 97",
@@ -77,6 +79,7 @@
       "LH-U 42",
       "LH-U 54",
       "LH-U 79",
+      "LH-V 14",
       "LH-V 47",
       "LH-V 56",
       "LH-W 76",
@@ -85,24 +88,27 @@
       "LH-W 98",
       "LH-X 60",
       "LH-Y 50",
+      "LH-Y 63",
+      "LH-Y 65",
       "LH-Y 76",
       "LH-Z 15"
     ],
-    "total": 54
+    "total": 59
   },
   "Motorrad Lüdinghausen": {
     "plates": [
       "LH-A 33",
       "LH-A 98",
-      "LH-B 26",
       "LH-B 98",
       "LH-C 51",
       "LH-C 68",
+      "LH-C 78",
       "LH-C 80",
       "LH-C 90",
       "LH-F 27",
       "LH-F 90",
       "LH-G 19",
+      "LH-G 21",
       "LH-G 44",
       "LH-G 52",
       "LH-G 83",
@@ -127,6 +133,7 @@
       "LH-Q 42",
       "LH-Q 95",
       "LH-Q 97",
+      "LH-R 51",
       "LH-R 89",
       "LH-S 72",
       "LH-S 97",
@@ -136,6 +143,7 @@
       "LH-U 42",
       "LH-U 54",
       "LH-U 79",
+      "LH-V 14",
       "LH-V 47",
       "LH-V 56",
       "LH-W 76",
@@ -144,9 +152,11 @@
       "LH-W 98",
       "LH-X 60",
       "LH-Y 50",
+      "LH-Y 63",
+      "LH-Y 65",
       "LH-Y 76",
       "LH-Z 15"
     ],
-    "total": 54
+    "total": 59
   }
 }
