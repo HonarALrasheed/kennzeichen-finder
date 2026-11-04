@@ -100,3 +100,5 @@
 {"at":"2026-11-03T13:36:37.665Z","target":"Motorrad Lüdinghausen","appeared":["LH-C 78","LH-G 21","LH-R 51","LH-V 14","LH-Y 63","LH-Y 65"],"gone":["LH-B 26"],"total":59}
 {"at":"2026-11-03T20:25:39.719Z","target":"Auto Lüdinghausen","appeared":[],"gone":["LH-M 95"],"total":58}
 {"at":"2026-11-03T20:25:50.860Z","target":"Motorrad Lüdinghausen","appeared":[],"gone":["LH-M 95"],"total":58}
+{"at":"2026-11-04T13:44:57.011Z","target":"Auto Münster","appeared":[],"gone":["MS-QW 3"],"total":10}
+{"at":"2026-11-04T13:45:09.971Z","target":"Motorrad Münster","appeared":[],"gone":["MS-QW 3"],"total":10}
