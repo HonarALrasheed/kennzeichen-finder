@@ -39,8 +39,6 @@
       "LH-C 78",
       "LH-C 80",
       "LH-C 90",
-      "LH-F 27",
-      "LH-F 90",
       "LH-G 19",
       "LH-G 21",
       "LH-G 44",
@@ -84,12 +82,11 @@
       "LH-W 98",
       "LH-X 60",
       "LH-Y 50",
-      "LH-Y 63",
       "LH-Y 65",
       "LH-Y 76",
       "LH-Z 15"
     ],
-    "total": 57
+    "total": 54
   },
   "Motorrad Lüdinghausen": {
     "plates": [
@@ -101,8 +98,6 @@
       "LH-C 78",
       "LH-C 80",
       "LH-C 90",
-      "LH-F 27",
-      "LH-F 90",
       "LH-G 19",
       "LH-G 21",
       "LH-G 44",
@@ -146,11 +141,10 @@
       "LH-W 98",
       "LH-X 60",
       "LH-Y 50",
-      "LH-Y 63",
       "LH-Y 65",
       "LH-Y 76",
       "LH-Z 15"
     ],
-    "total": 57
+    "total": 54
   }
 }
