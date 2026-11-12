@@ -117,3 +117,5 @@
 {"at":"2026-11-11T21:07:39.652Z","target":"Motorrad Münster","appeared":[],"gone":["MS-QC 6","MS-QC 8","MS-QH 9","MS-QW 9","MS-QY 6","MS-UQ 9","MS-VQ 6","MS-VQ 9","MS-WQ 6"],"total":0}
 {"at":"2026-11-11T23:57:39.402Z","target":"Auto Münster","appeared":["MS-QC 6","MS-QC 8","MS-QH 9","MS-QW 9","MS-QY 6","MS-UQ 9","MS-VQ 6","MS-VQ 9","MS-WQ 6"],"gone":[],"total":9}
 {"at":"2026-11-11T23:57:50.188Z","target":"Motorrad Münster","appeared":["MS-QC 6","MS-QC 8","MS-QH 9","MS-QW 9","MS-QY 6","MS-UQ 9","MS-VQ 6","MS-VQ 9","MS-WQ 6"],"gone":[],"total":9}
+{"at":"2026-11-12T14:35:44.130Z","target":"Auto Münster","appeared":[],"gone":["MS-QH 9","MS-UQ 9"],"total":7}
+{"at":"2026-11-12T14:35:55.980Z","target":"Motorrad Münster","appeared":[],"gone":["MS-QH 9","MS-UQ 9"],"total":7}
