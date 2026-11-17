@@ -12,8 +12,16 @@
     "total": 7
   },
   "Auto Münster": {
-    "plates": [],
-    "total": 0
+    "plates": [
+      "MS-QC 6",
+      "MS-QC 8",
+      "MS-QW 9",
+      "MS-QY 6",
+      "MS-VQ 6",
+      "MS-VQ 9",
+      "MS-WQ 6"
+    ],
+    "total": 7
   },
   "Auto Lüdinghausen": {
     "plates": [
