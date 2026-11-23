@@ -11,15 +11,8 @@
     "total": 6
   },
   "Auto Münster": {
-    "plates": [
-      "MS-QC 6",
-      "MS-QC 8",
-      "MS-QW 9",
-      "MS-QY 6",
-      "MS-VQ 9",
-      "MS-WQ 6"
-    ],
-    "total": 6
+    "plates": [],
+    "total": 0
   },
   "Auto Lüdinghausen": {
     "plates": [
@@ -37,7 +30,6 @@
       "LH-H 62",
       "LH-H 82",
       "LH-J 49",
-      "LH-K 21",
       "LH-K 46",
       "LH-M 35",
       "LH-M 83",
@@ -47,8 +39,6 @@
       "LH-Q 42",
       "LH-Q 95",
       "LH-Q 97",
-      "LH-R 51",
-      "LH-R 89",
       "LH-S 72",
       "LH-S 97",
       "LH-U 12",
@@ -68,7 +58,7 @@
       "LH-Y 65",
       "LH-Y 76"
     ],
-    "total": 44
+    "total": 41
   },
   "Motorrad Lüdinghausen": {
     "plates": [
@@ -86,7 +76,6 @@
       "LH-H 62",
       "LH-H 82",
       "LH-J 49",
-      "LH-K 21",
       "LH-K 46",
       "LH-M 35",
       "LH-M 83",
@@ -96,8 +85,6 @@
       "LH-Q 42",
       "LH-Q 95",
       "LH-Q 97",
-      "LH-R 51",
-      "LH-R 89",
       "LH-S 72",
       "LH-S 97",
       "LH-U 12",
@@ -117,6 +104,6 @@
       "LH-Y 65",
       "LH-Y 76"
     ],
-    "total": 44
+    "total": 41
   }
 }
