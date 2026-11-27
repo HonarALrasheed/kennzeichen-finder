@@ -1,23 +1,16 @@
 {
   "Motorrad Münster": {
-    "plates": [
-      "MS-QC 8",
-      "MS-QW 9",
-      "MS-QY 6",
-      "MS-VQ 9",
-      "MS-WQ 6"
-    ],
-    "total": 5
+    "plates": [],
+    "total": 0
   },
   "Auto Münster": {
     "plates": [
       "MS-QC 8",
       "MS-QW 9",
       "MS-QY 6",
-      "MS-VQ 9",
       "MS-WQ 6"
     ],
-    "total": 5
+    "total": 4
   },
   "Auto Lüdinghausen": {
     "plates": [

@@ -154,3 +154,5 @@
 {"at":"2026-11-25T16:45:50.823Z","target":"Motorrad Münster","appeared":[],"gone":["MS-QC 6"],"total":5}
 {"at":"2026-11-26T16:20:53.737Z","target":"Auto Lüdinghausen","appeared":[],"gone":["LH-G 21"],"total":37}
 {"at":"2026-11-26T16:21:02.355Z","target":"Motorrad Lüdinghausen","appeared":[],"gone":["LH-G 21"],"total":37}
+{"at":"2026-11-27T16:06:38.758Z","target":"Auto Münster","appeared":[],"gone":["MS-VQ 9"],"total":4}
+{"at":"2026-11-27T16:06:54.309Z","target":"Motorrad Münster","appeared":[],"gone":["MS-QC 8","MS-QW 9","MS-QY 6","MS-VQ 9","MS-WQ 6"],"total":0}
